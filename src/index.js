@@ -1,5 +1,6 @@
 // we copy all this code from our project we create on firebase
 import { initializeApp } from "firebase/app";
+// firestore imports
 import {
   getFirestore,
   collection,
@@ -13,6 +14,13 @@ import {
   orderBy,
   updateDoc,
 } from "firebase/firestore";
+// authentication imports
+import {
+  getAuth,
+  createUserWithEmailAndPassword, // for sign up new user
+  signOut, // logout the user
+  signInWithEmailAndPassword, // login/sign in existing user
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDfsB1iA2eDkF5f4FevJ5_9ky7brHen0Rs",
@@ -24,8 +32,12 @@ const firebaseConfig = {
 };
 // Initialize Firebase app
 initializeApp(firebaseConfig);
-// initialize service
+// initialize services
+// --------- this is for our data base
 const db = getFirestore();
+// --------- this is for authentication
+const auth = getAuth();
+
 // collection refrence
 const collRef = collection(db, "Students");
 
@@ -128,4 +140,48 @@ onSnapshot(q, (snapshot) => {
     condArray.push({ id: doc.id, ...doc.data() });
   });
   console.log(condArray);
+});
+
+// -----------------******* Firebase Authentication *************--------------
+// sign up new user(its means after signing up you considered logeed in )
+// already signed up user cant sign up again , now he will go for login
+const signUpForm = document.querySelector(".signUp");
+signUpForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const signupEmail = signUpForm.email.value;
+  const signupPassword = signUpForm.password.value; // here password should be atlesst 6 digits otherwise by default firebase through an error
+  createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
+    .then((cred) => {
+      signUpForm.reset();
+      console.log("User created:- ", cred.user);
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+//  logout user
+const loggedOutBtn = document.querySelector(".btn");
+loggedOutBtn.addEventListener("click", () => {
+  signOut(auth)
+    .then(() => {
+      console.log("User is logged out");
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+// login the existing user after sign up
+const loginForm = document.querySelector(".login");
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const loginEmail = loginForm.email.value;
+  const loginPassword = loginForm.password.value;
+  signInWithEmailAndPassword(auth, loginEmail, loginPassword)
+    .then((cred) => {
+      loginForm.reset();
+      console.log("The user is signed in", cred.user);
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
 });
