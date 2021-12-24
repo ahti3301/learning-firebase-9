@@ -20,6 +20,7 @@ import {
   createUserWithEmailAndPassword, // for sign up new user
   signOut, // logout the user
   signInWithEmailAndPassword, // login/sign in existing user
+  onAuthStateChanged,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -139,7 +140,7 @@ onSnapshot(q, (snapshot) => {
   snapshot.docs.forEach((doc) => {
     condArray.push({ id: doc.id, ...doc.data() });
   });
-  console.log(condArray);
+  //console.log(condArray);
 });
 
 // -----------------******* Firebase Authentication *************--------------
@@ -153,7 +154,7 @@ signUpForm.addEventListener("submit", (e) => {
   createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
     .then((cred) => {
       signUpForm.reset();
-      console.log("User created:- ", cred.user);
+      /// console.log("User created:- ", cred.user);
     })
     .catch((err) => {
       console.log(err.message);
@@ -164,7 +165,7 @@ const loggedOutBtn = document.querySelector(".btn");
 loggedOutBtn.addEventListener("click", () => {
   signOut(auth)
     .then(() => {
-      console.log("User is logged out");
+      //console.log("User is logged out");
     })
     .catch((err) => {
       console.log(err.message);
@@ -179,9 +180,15 @@ loginForm.addEventListener("submit", (e) => {
   signInWithEmailAndPassword(auth, loginEmail, loginPassword)
     .then((cred) => {
       loginForm.reset();
-      console.log("The user is signed in", cred.user);
+      /// console.log("The user is signed in", cred.user);
     })
     .catch((err) => {
       console.log(err.message);
     });
+});
+// your auth state change
+// syntax:- onAuthStateChanged(auth,()=>{})
+// whenever you login, logout, sign up, this function will fire
+onAuthStateChanged(auth, (user) => {
+  console.log("The user authentication state has changed:- ", user);
 });
